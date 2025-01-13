@@ -1,22 +1,13 @@
 import discord
 import sys
-import requests
+
+from scry_call import scry_call
+from scan_message import scan_message
 
 SECRET = sys.argv[1]
 
-def scan_message(message):
+print(scry_call(scan_message('my nafe g erg {dark ritual} fewEF wef fefw {damnation}')))
 
-    if '{' and '}' in message:
-        a = message.find('{')
-        b = message.find('}')
-        search = message[a+1:b]
-        return search
-
-def scry_call(query_string):
-    response = requests.get(f"https://api.scryfall.com/cards/search?q={query_string}")
-    if response.status_code == 200:
-        return response.json()
-    return None
 
 class MyClient(discord.Client):
     async def on_ready(self):
@@ -24,18 +15,17 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         print(f'Message from {message.author}: {message.content}')
+        if message.author == 'merlin1011.':
+             await message.channel.send('Brendan, nobody asked for your opinion')
         search = scan_message(message.content)
         if search:
-            res = scry_call(search)
-            if res and 'data' in res and len(res['data']) > 0:
-                card_data = res['data'][0]  # Get the first card in the results
-                if 'image_uris' in card_data and 'normal' in card_data['image_uris']:
-                    img = card_data['image_uris']['normal']
-                    await message.channel.send(img)
-                else:
-                    await message.channel.send("Sorry, I couldn't find an image for that card.")
+            res = await scry_call(search)
+            if res and res.length > 0:
+                    for i in res:
+                        await message.channel.send(i)
             else:
-                await message.channel.send("Sorry, I couldn't find that card.")
+                await message.channel.send("Sorry, I couldn't find an image for that card.")
+
 
 intents = discord.Intents.default()
 intents.message_content = True
