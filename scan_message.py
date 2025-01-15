@@ -1,17 +1,17 @@
-import requests
 
 def scan_message(message):
-
+   
     queries = []
     start_bracket = None
-    if '{' and '}' in message:
-        for i in range(len(message)):
-            if message[i] == '{' and start_bracket == None:
+    if '{' in message and '}' in message:
+        for i, char in enumerate(message):
+            if char == '{' and start_bracket is None:
                 start_bracket = i
         
-            if message[i] == '}':
-                if start_bracket:
+            if char == '}':
+                if start_bracket is not None:
                     queries.append(message[start_bracket+1:i])
                     start_bracket = None
+    print(queries)
+    return queries
 
-        return queries
